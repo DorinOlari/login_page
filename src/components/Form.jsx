@@ -1,4 +1,42 @@
+import axios from "axios";
+
 const Form = () => {
+
+
+    const logare = async (ev) => {
+        ev.preventDefault()
+
+        const email = document.querySelector('#email').value
+        const password = document.querySelector('#password').value
+
+        console.log(email,password)
+
+        try{
+            const response = await axios.post('https://dummyjson.com/auth/login', {
+                username:`${email}`,
+                password:`${password}`
+            })
+
+            if (response){
+                const user ={
+                   firstName: response.data.firstName,
+                   lastName: response.data.lastName
+                }
+
+
+                alert(`Felicitari ${user.firstName} ${user.lastName} vati logat cu succes...!`)
+
+            }
+
+        }
+
+        catch (error){
+            console.error(`Sorry asa utilizator nu egzista: ${error}`)
+        }
+
+    }
+
+
     return (
         <div className="flex justify-center items-center h-screen bg-indigo-600">
             <div className="w-96 p-6 shadow-lg bg-white rounded-md">
@@ -15,7 +53,7 @@ const Form = () => {
                            placeholder="Password"/>
                 </div>
                 <div className="mt-9">
-                    <button type="button"
+                    <button type="button" onClick={logare}
                             className="border-2 border-indigo-700 bg-indigo-700 text-white py-2.5 w-full rounded-xl hover:bg-indigo-600">Login
                     </button>
                 </div>
