@@ -1,20 +1,36 @@
 import axios from "axios";
+import {useEffect, useState} from "react";
+import {useNavigate} from "react-router-dom";
 
 const Form = () => {
+
+    const [data, setData] = useState({usernameInput:'', passwordInput:''})
+
+    const [info, setInfo] = useState(false)
+
 
 
     const logare = async (ev) => {
         ev.preventDefault()
 
-        const email = document.querySelector('#email').value
-        const password = document.querySelector('#password').value
+if (data.usernameInput.length === 0 || data.passwordInput.length === 0){
+    let input_email = document.querySelector('#email')
+    let input_password = document.querySelector('#password')
 
-        console.log(email,password)
+    input_email.setAttribute('style', 'border-bottom: 3px solid red')
+    input_email.setAttribute('placeholder', 'Nu aveti introdus nici un userName...!')
+
+    input_password.setAttribute('style', 'background: #F01F1F')
+    input_password.setAttribute('placeholder', 'Nu ati introdus nici un password')
+
+}
+
+
 
         try{
             const response = await axios.post('https://dummyjson.com/auth/login', {
-                username:`${email}`,
-                password:`${password}`
+                username:`${data.usernameInput}`,
+                password:`${data.passwordInput}`
             })
 
             if (response){
@@ -23,8 +39,21 @@ const Form = () => {
                    lastName: response.data.lastName
                 }
 
+                const token_access = {
+                    accessToken: response.data.accessToken,
+                    firstName: response.data.firstName,
+                    lastName: response.data.lastName,
+                    image: response.data.image
+                }
+
+
+                localStorage.setItem('Token', JSON.stringify(token_access))
 
                 alert(`Felicitari ${user.firstName} ${user.lastName} vati logat cu succes...!`)
+
+                setInfo(true)
+
+                setData({usernameInput:'', passwordInput:''})
 
             }
 
@@ -34,7 +63,20 @@ const Form = () => {
             console.error(`Sorry asa utilizator nu egzista: ${error}`)
         }
 
-    }
+    };
+
+
+
+    const navigate = useNavigate()
+
+    useEffect(()=>{
+        if (info){
+            navigate('/profile')
+        }
+        else {
+            navigate('/')
+        }
+    }, [info, navigate])
 
 
     return (
@@ -44,11 +86,15 @@ const Form = () => {
                 <hr className="mt-9"/>
                 <div className="mt-7">
                     <input type="text" id="email"
+                           value={data.usernameInput}
+                           onChange={(event)=> setData({...data, usernameInput: event.target.value})}
                            className="w-full text-base px-2 py-1 outline-none border-b-2 border-gray-600"
                            placeholder="Email"/>
                 </div>
                 <div className="mt-8">
                     <input type="password" id="password"
+                           value={data.passwordInput}
+                           onChange={(event)=> setData({...data, passwordInput: event.target.value})}
                            className="w-full text-base px-2 py-1 outline-none border-b-2 border-gray-600"
                            placeholder="Password"/>
                 </div>
